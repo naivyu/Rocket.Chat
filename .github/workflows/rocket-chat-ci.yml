@@ -45,3 +45,6 @@ jobs:
           yarn
           yarn dsv  # Starts Rocket.Chat
 
+      - name: Run Tests
+        run: |
+          yarn test
