@@ -1,1 +1,47 @@
+name: Rocket.Chat CI
+
+on:
+  push:
+    branches:
+      - main  # Change to your default branch if different
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build_and_test:
+    runs-on: ubuntu-latest  # Uses a Linux environment
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.13.1  # Replace with required Node.js version
+          cache: 'yarn'  # Caches dependencies for faster builds
+
+      - name: Install dependencies
+        run: |
+          sudo apt update && sudo apt install -y git curl unzip make build-essential python3 g++
+          yarn install
+
+      - name: Setup Deno
+        run: |
+          curl -fsSL https://deno.land/install.sh | sh
+          echo "export DENO_INSTALL=$HOME/.deno" >> $GITHUB_ENV
+          echo "export PATH=\$DENO_INSTALL/bin:\$PATH" >> $GITHUB_ENV
+          source $GITHUB_ENV
+          deno --version
+
+      - name: Install Meteor
+        run: |
+          curl https://install.meteor.com/ | sh
+          meteor --version
+
+      - name: Build Rocket.Chat
+        run: |
+          yarn
+          yarn dsv  # Starts Rocket.Chat
 
